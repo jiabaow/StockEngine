@@ -22,6 +22,35 @@ class Order:
         self.quantity = quantity
         self.price = price
 
+
+def ticker_to_index(ticker):
+    return int(ticker[3:])
+
+
+def binary_insert_buy(orders, order):
+    left = 0
+    right = len(orders)
+    while left < right:
+        mid = (left + right) // 2
+        if orders[mid].price < order.price:
+            right = mid
+        else:
+            left = mid + 1
+    orders.insert(left, order)
+
+
+def binary_insert_sell(orders, order):
+    left = 0
+    right = len(orders)
+    while left < right:
+        mid = (left + right) // 2
+        if orders[mid].price > order.price:
+            right = mid
+        else:
+            left = mid + 1
+    orders.insert(left, order)
+
+
 class OrderBook:
     def __init__(self, max_tickers=MAX_TICKERS):
         self.max_tickers = max_tickers
@@ -29,40 +58,15 @@ class OrderBook:
         self.sell_orders = [[] for _ in range(max_tickers)]
         self.locks = [threading.Lock() for _ in range(max_tickers)]
 
-    def ticker_to_index(self, ticker):
-        return int(ticker[3:])
-
-    def binary_insert_buy(self, orders, order):
-        left = 0
-        right = len(orders)
-        while left < right:
-            mid = (left + right) // 2
-            if orders[mid].price < order.price:
-                right = mid
-            else:
-                left = mid + 1
-        orders.insert(left, order)
-
-    def binary_insert_sell(self, orders, order):
-        left = 0
-        right = len(orders)
-        while left < right:
-            mid = (left + right) // 2
-            if orders[mid].price > order.price:
-                right = mid
-            else:
-                left = mid + 1
-        orders.insert(left, order)
-
     def add_order(self, order):
-        index = self.ticker_to_index(order.ticker)
+        index = ticker_to_index(order.ticker)
         lock = self.locks[index]
         lock.acquire()
         try:
             if order.order_type == 'Buy':
-                self.binary_insert_buy(self.buy_orders[index], order)
+                binary_insert_buy(self.buy_orders[index], order)
             elif order.order_type == 'Sell':
-                self.binary_insert_sell(self.sell_orders[index], order)
+                binary_insert_sell(self.sell_orders[index], order)
         finally:
             lock.release()
 
