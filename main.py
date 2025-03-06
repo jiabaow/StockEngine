@@ -137,10 +137,26 @@ def main():
     order_book.match_orders()
 
 
+def test():
+    order_book = OrderBook(max_tickers=1)
+    ticker = "TKR0"
+    buy1 = Order(order_type='Buy', ticker=ticker, quantity=100, price=150.00)
+    buy2 = Order(order_type='Buy', ticker=ticker, quantity=200, price=155.00)
+
+    sell1 = Order(order_type='Sell', ticker=ticker, quantity=150, price=150.00)
+    sell2 = Order(order_type='Sell', ticker=ticker,quantity=100, price=152.00)
+
+    order_book.add_order(buy1)
+    order_book.add_order(buy2)
+    order_book.add_order(sell1)
+    order_book.add_order(sell2)
+
+    order_book.match_orders()
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     main()
+    #test()
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
